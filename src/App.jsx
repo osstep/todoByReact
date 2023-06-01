@@ -1,74 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
-import PostList from './components/PostList'
-import MyButton from './components/UI/button/MyButton'
-import PostForm from './components/PostForm'
-import PostFilter from './components/PostFilter'
-import MyModal from './components/UI/MyModal/MyModal'
-import { usePosts } from './hooks/usePosts'
-import PostService from './API/PostService'
-import Loader from './components/UI/Loader/Loader'
-import { useFetching } from './hooks/useFetching'
+import About from './pages/About'
+import Posts from './pages/Posts'
+import Navbar from './components/UI/Navbar/Navbar'
+import MainPage from './pages/MainPage'
 
 function App() {
-  const [posts, setPosts] = useState([])
-  const [filter, setFilter] = useState({
-    sort: '',
-    query: '',
-  })
-  const [modal, setModal] = useState(false)
-  const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
-  const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
-    const posts = await PostService.getAll()
-    console.log(posts);
-    setPosts(posts)
-  })
-
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  const createPost = (newPost) => {
-    setPosts([...posts, newPost])
-    setModal(false)
-  }
-
-  const removePost = (post) => {
-    setPosts(posts.filter((p) => p.id !== post.id))
-  }
-
-
   return (
-    <div className="App">
-      <MyButton
-        style={{ marginTop: '30px' }}
-        onClick={() => setModal(true)}
-      >
-        Создать пост
-      </MyButton>
-      <MyModal
-        visible={modal}
-        setVisible={setModal}
-      >
-        <PostForm create={createPost} />
-      </MyModal>
-
-      <hr style={{ margin: '15px 0' }}></hr>
-      <PostFilter
-        filter={filter}
-        setFilter={setFilter}
-      />
-      {postError && <h1>Произошла ошибка {postError}</h1>}
-      {isPostsLoading ? (
-      <div style={{display: 'flex', justifyContent: 'center', marginTop: '25px'}}><Loader /></div>
-      ) : (
-        <PostList
-          remove={removePost}
-          posts={sortedAndSearchedPosts}
-          title={'Список постов'}
-        />
-      )}
-    </div>
+    
+    <BrowserRouter>
+    
+    <Routes>
+      <Route path='/' element={<MainPage/>}>
+        <Route index element={<Posts/>}></Route>
+        <Route path='/about' element={<About/>}></Route>
+        
+      </Route>
+    </Routes>
+    </BrowserRouter>
   )
 }
 
